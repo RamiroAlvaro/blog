@@ -2,6 +2,7 @@ from django.core.mail import send_mail
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
+from taggit.models import Tag
 
 from .forms import EmailPostForm, CommentForm
 from .models import Post
@@ -14,8 +15,13 @@ class PostListView(ListView):
     template_name = 'blog/post/list.html'
 
 
-def post_list(request):
+def post_list(request, tag_slug=None):
     object_list = Post.published.all()
+    tag = None
+
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        object_list = object_list.filter(tags__in=[tag])
     paginator = Paginator(object_list, 3)  # tres postagems em cada pagina
     page = request.GET.get('page')
     try:
@@ -27,7 +33,7 @@ def post_list(request):
         # Se a pagina estiver fora do intervalo,
         # exibe a ultima pagina de resultados
         posts = paginator.page(paginator.num_pages)
-    return render(request, 'blog/post/list.html', {'page': page, 'posts': posts})
+    return render(request, 'blog/post/list.html', {'page': page, 'posts': posts, 'tag': tag})
 
 
 def post_detail(request, year, month, day, post):
