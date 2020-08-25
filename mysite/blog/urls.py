@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .feeds import LatestPostsFeed
-from .views import post_list, post_detail, PostListView, post_share, post_search
+from .views import post_list, post_detail, post_share, post_search
 
 app_name = 'blog'
 
